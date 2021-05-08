@@ -1,7 +1,7 @@
-##Link do repozytorium
+## Link do repozytorium
 https://github.com/kacxsku/MPKTicketMachine
 
-##Temat projektu
+## Temat projektu
 1. Automat biletowy MPK
 
 Opis zadania
