@@ -1,3 +1,4 @@
+import re
 import tkinter as tk
 from tkinter import messagebox
 import CoinExtractor
@@ -61,9 +62,9 @@ class Page2(tk.Frame):
         counter_labels = self.createCounterLabels()
         self.createButtons('+', 0.6, counter_labels)
         self.createButtons('-', 0.8, counter_labels)
-        pay_button = tk.Button(self, text="Przejdz do platnosci", relief=tk.RAISED, command=lambda: [self.openPayWindow(), self.takeValueFromLablesAndCalculate(counter_labels)])
+        pay_button = tk.Button(self, text="Przejdz do platnosci", relief=tk.RAISED,
+                               command= lambda: [self.takeValueFromLablesAndCalculate(counter_labels),self.openPayWindow()])
 
-        #TODO: tutaj sume jakos licz i przekazuj do payWindow
         pay_button.place(relx=0.6, rely=0.9)
 
     def takeValueFromLablesAndCalculate(self, counter_labels):
@@ -72,7 +73,7 @@ class Page2(tk.Frame):
             value = counter_labels[i].cget("text")
             if value != 0:
                 counter_labels[i].configure(text="0")
-                self.machine.calcualteAllChoosenTicketsPrice(tic,value)
+                self.machine.calcualteAllChoosenTicketsPrice(tic, value)
             i += 1
 
     def createCounterLabels(self):
@@ -83,7 +84,7 @@ class Page2(tk.Frame):
             labels_list[i].place(relx=0.7, rely=0.22 + i / 9.3)
         return labels_list
 
-    def changeValueOnLabel(self, i, value):
+    def changeValueOnLabel(self, i, value):##uzyc do buttonow
         return lambda: i.configure(
             text=str(self.opr[value](int(i.cget("text")), 1)) if int(i.cget("text")) - 1 >= 0 else i.configure(text=1))
 
@@ -96,23 +97,35 @@ class Page2(tk.Frame):
             buttons_list.append(button)
         return buttons_list
 
-    def openPayWindow(self):
+
+    def openPayWindow(self):#ogolnie to nie dokonca dziala przekazywanie-- label do zaplaty wyswietla wartosc w 2 wejsciu
         pay_window = tk.Toplevel()
         pay_window.resizable(False, False)
-        moneys_list = CoinExtractor.CoinExtractor.getMoneyList()
-        tk.Label(pay_window, text="Do zapłaty:"+str(self.machine.getMoneySum())).pack(side=tk.TOP)#self.coinExtractor.moneys_sum()#self.calculatePriceForAllTickets()
+        moneys_list = self.coinExtractor.getMoneyList()
+        var = tk.IntVar()
+        var.set(int(self.machine.getMoneySum()))
+        leftToPay_label=tk.Label(pay_window)
+        leftToPay_label.configure( text="Do zapłaty: "+str(self.machine.getMoneySum()))
+        leftToPay_label.pack(side=tk.TOP)
         tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).pack(side=tk.BOTTOM)
         tk.Label(pay_window, text="Ilość monet:").pack(side=tk.TOP)
         var = tk.IntVar()
-        moneys_count = tk.Spinbox(pay_window, from_=1, to=1000, width=10, bd=6, textvariable=var).pack(side=tk.TOP)###TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
+        tk.Spinbox(pay_window, from_=1, to=1000, width=10, bd=6, textvariable=var).pack(side=tk.TOP)###TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
+
+       #####TODO:::::
         spinboxValue= var.get()
-        if not isinstance(spinboxValue,int):
+        if not isinstance(spinboxValue,int):####.configure(text="0")
             print(type(var.get()))#TODO
         elif spinboxValue<0:
             print('xxxx')
             pass
         for money in moneys_list:##TODO: nie dziala jak cos monety sie dodaja ale pojedynczo    self.addToCoinExtractor(m,spinboxValue)
-            tk.Button(pay_window, text=str(money), command=lambda m=money: self.machine.calcualteAllChoosenTicketsPrice(m)).pack(side=tk.LEFT)
+            temp = re.search(r"[-+]?\d*\.\d+|\d+", str(money)).group()
+            print(type(temp))
+            ###TODO: zmienia odrazu a nie po kliknieciu jak cos
+            #tk.Button(pay_window, text=str(money),command = leftToPay_label.configure(text="Do zaplaty:"+ str(float(temp)-money))).pack(side=tk.LEFT)
+
+
 
     def endMessageBox(self):
         res = messagebox.askquestion("exit", "Czy chcesz zakończyć?")

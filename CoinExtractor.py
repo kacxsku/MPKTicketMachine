@@ -47,7 +47,6 @@ class CoinExtractor:
         else:
             self.giveMoneyBack(amount, 0)
 
-    @classmethod
     def getMoneyList(self):
         return self._moneys
 
