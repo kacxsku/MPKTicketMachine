@@ -1,5 +1,3 @@
-from enum import Enum
-
 
 class Tickets:
     ticket = {"20 min ulgowy": 2,
@@ -9,8 +7,5 @@ class Tickets:
                              "60 min ulgowy": 4,
                              "60 min normalny": 8}
 
-    def getTicketPrice(self,key):
+    def getTicketPrice(self, key):
         return self.ticket.get(key)
-
-
-
