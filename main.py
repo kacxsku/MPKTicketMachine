@@ -1,8 +1,8 @@
 import tkinter as tk
+from tkinter import messagebox
 import CoinExtractor
 from Tickets import Tickets
 import os
-from PIL import Image, ImageTk
 
 
 class Page(tk.Tk):
@@ -18,11 +18,9 @@ class Page(tk.Tk):
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
-
         self.show_frame("Page1")
 
     def show_frame(self, page_name):
-        '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
 
@@ -35,15 +33,12 @@ class Page1(tk.Frame):
         label.pack(side="top", fill="both", expand=True)
         tk.Frame(self)
         dir_path = os.path.dirname(__file__)
-
         canvas = tk.Canvas(self, width=340, height=250)
         canvas.pack()
         self.img = tk.PhotoImage(file=dir_path + r"/assets/ticket.gif")
         canvas.create_image(10, 10, anchor=tk.NW, image=self.img)
-
-        button1 = tk.Button(self, text="Go to Page One",
+        button1 = tk.Button(self, text="Przejdź do wyboru i zakupu biletu", relief=tk.GROOVE,
                             command=lambda: controller.show_frame("Page2"))
-
         button1.pack()
 
 
@@ -53,47 +48,79 @@ class Page2(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+        self.ticket = Tickets()
+        self.coinExtractor = CoinExtractor.CoinExtractor()
+        self.parent = parent
         label = tk.Label(self, text="Prosze wybrać bilet:")
         label.pack(side="top")
         lb = tk.Label(self, text='', justify=tk.LEFT)
         lb['text'] = '\n\n'.join('{}\t  cena:\t{}zl'.format(k, d) for k, d in Tickets.ticket.items())
         lb.pack(side="left")
-
         counter_labels = self.createCounterLabels()
         self.createButtons('+', 0.6, counter_labels)
-        self.createButtons('-', 0.7, counter_labels)
-
-        pay_button = tk.Button(self, text="Przejdz do platnosci", command=self.openPayWindow)
+        self.createButtons('-', 0.8, counter_labels)
+        pay_button = tk.Button(self, text="Przejdz do platnosci", relief=tk.RAISED, command=self.openPayWindow)#TODO: tutaj sume jakos licz i przekazuj do payWindow
         pay_button.place(relx=0.6, rely=0.9)
 
+    # sciagac value z labela i jakos przekazywac do funkcji liczacej sume pewnie petla jakas
+
+    def endMessageBox(self):
+        res = messagebox.askquestion("exit", "Czy chcesz zakończyć?")
+        if res == 'yes':
+            self.quit()
+
     def openPayWindow(self):
-        payWindow = tk.Toplevel()
+        pay_window = tk.Toplevel()
+        pay_window.resizable(False, False)
         moneys_list = CoinExtractor.CoinExtractor.getMoneyList()
-        tk.Label(payWindow, text="reszta:").pack(side=tk.TOP)
-        tk.Button(payWindow, text="zakoncz transakcje").pack(side=tk.BOTTOM)
+        tk.Label(pay_window, text="Do zapłaty:"+str(0)).pack(side=tk.TOP)#self.coinExtractor.moneys_sum()#self.calculatePriceForAllTickets()
+        tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).pack(side=tk.BOTTOM)
+        tk.Label(pay_window, text="Ilość monet:").pack(side=tk.TOP)
+        var = tk.IntVar()
+        #https://stackoverflow.com/questions/44563549/tkinter-how-to-prevent-users-entering-strings-into-spin-box
+        #https://stackoverflow.com/questions/42729317/python-tkinter-spinbox-validate-fail
+        #vcmd = (self.register(self.validate_spinbox), '%P')  validatecommand=vcmd
+        moneys_count = tk.Spinbox(pay_window, from_=1, to=1000, width=10, bd=6, textvariable=var).pack(side=tk.TOP)###TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
+        spinboxValue= var.get()
+        if not isinstance(spinboxValue,int):
+            print(type(var.get()))#TODO
+        elif spinboxValue<0:
+            print('xxxx')
+            pass
         for money in moneys_list:
-            tk.Button(payWindow, text=str(money)).pack(side=tk.LEFT)
+            tk.Button(pay_window, text=str(money), command=lambda m=money: self.addToCoinExtractor(m)).pack(side=tk.LEFT)
+
+
+    def validate_spinbox(self, new_value):
+        # Returning True allows the edit to happen, False prevents it.
+        return new_value.isdigit()
+##TODO:
+    def calculatePriceForAllTickets(self,buttons,labels):
+        price = 0
+        for b,l in zip(buttons,labels):
+            price+= self.ticket.getTicketPrice()
+        return  price#self.ticket.getTicketPrice()#zbierz wartosc z przyciskow*cena biletu
+
+
+    def addToCoinExtractor(self,money):#TODO: tak zeby dodawalo spinbox.get *moneta razy monete
+        newMoney = CoinExtractor.Moneta(money)
+        self.coinExtractor.add_coin(newMoney)
 
     def createCounterLabels(self):
         labels_list = []
         counter = 0
         for i in range(len(Tickets.ticket)):
             labels_list.append(tk.Label(self, text=counter))
-            labels_list[i].place(relx=0.8, rely=0.22 + i / 9.3)
+            labels_list[i].place(relx=0.7, rely=0.22 + i / 9.3)
         return labels_list
 
     def changeValueOnLabel(self, i, value):
         return lambda: i.configure(
             text=str(self.opr[value](int(i.cget("text")), 1)) if int(i.cget("text")) - 1 >= 0 else i.configure(text=1))
 
-    def calculateMoney(self):
-        # suma pieniedzy
-        valueLabel = tk.Label(self, text="do zaplaty: ")
-        valueLabel.place(relx=0.4, rely=0.9)
-
     def createButtons(self, value, relx, labels):
         buttons_list = []
-        for i in range(0, len(Tickets.ticket)):  # TODO:
+        for i in range(0, len(Tickets.ticket)):
             button = tk.Button(self, text=value)
             button.configure(command=self.changeValueOnLabel(labels[i], value))
             button.place(relx=relx, rely=0.22 + i / 9.3)
@@ -101,31 +128,14 @@ class Page2(tk.Frame):
         return buttons_list
 
 
-class Page3(Page):
-    def __init__(self, *args, **kwargs):
-        Page.__init__(self, *args, **kwargs)
-        label = tk.Label(self, text="This is page 3")
-        label.pack(side="top", fill="both", expand=True)
-        # ticket = Tickets()
-        # var_material = tk.StringVar()
-        # tickets_combobox = ttk.Combobox(self,text="bilet" ,
-        #                                 values=list(ticket.twenty_minutes_ticket.keys()),
-        #                                 justify="center",
-        #                                 textvariable=var_material,
-        #                                 state='readonly')
-        # tickets_combobox.set('wybierz bilet')
-        # label_selected = tk.Label(self, text="Not Selected")
-        # tickets_combobox.bind('<<ComboboxSelected>>', lambda event: label_selected.config(text=ticket.twenty_minutes_ticket[var_material.get()]))
-        # tickets_combobox.place(relx=0.3, rely=0.12, anchor='n')
-
-
 if __name__ == "__main__":
-    # root = tk.Tk()
-    # main = Page(root)
-    # main.pack(side="top", fill="both", expand=True)
-    # root.wm_geometry("350x300")
-    # root.mainloop()
     app = Page()
     app.wm_geometry("410x310")
-    app.resizable(False,False)
+    app.resizable(False, False)
     app.mainloop()
+
+# Dodaj message boxy
+#pomysl o wrzucaniu pieniedzy jak to ma wygladac
+# dodaj funkcjonalnosci
+# podziel na moduly
+# podziel na pakiety

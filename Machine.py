@@ -5,8 +5,8 @@ from Tickets import *
 class Machine(CoinExtractor):
     _sum = 0
 
-    def __init__(self,money):
-        super().__init__(money)
+    def __init__(self):
+        super().__init__()
         pass
 
     def buyTicket(self, ticketPrice):

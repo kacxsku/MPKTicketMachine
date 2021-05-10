@@ -1,23 +1,37 @@
+from decimal import Decimal
+
+class Moneta:
+    def __init__(self, wartosc):
+        if wartosc in {0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5,10,20,50}:
+            self._value = Decimal(str(wartosc))
+        else:
+            #raise NotImplementedError()
+            self._value = Decimal('0')
+            print('nieznana moneta. Przypisano wartosc 0zl')\
+
+    def getValue(self):
+        return self._value
+
+    def __add__(self, other):
+        return self._value+other
+
+
 class CoinExtractor:
     _moneys = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10, 20, 50]
 
-    def __init__(self, money):
-        if money not in self._moneys:
-            raise NotImplementedError() #TODO: error
-        self.money = money
+    def __init__(self):
         self._available_moneys = []  # TODO: check it
 
-    def __init__(self):
-        pass
-
     def add_coin(self, money):
+        if not isinstance(money,Moneta):
+            raise NotImplementedError() #TODO: error
         self._available_moneys.append(money)
 
     def remove_coin(self, money):
         self._available_moneys.pop(money)
 
     def moneys_sum(self): #TODO:
-        return sum(self._available_moneys)
+        return sum(m.getValue() for m in self._available_moneys)
 
     def giveMoneyBack(self, price, amount):#TODO:::::
         change = sum(amount) - price

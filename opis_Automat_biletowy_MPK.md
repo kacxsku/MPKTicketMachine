@@ -1,3 +1,4 @@
+
 ## Link do repozytorium
 https://github.com/kacxsku/MPKTicketMachine
 
@@ -35,3 +36,8 @@ Testy
 4. Zakup biletu placąc po 1gr - suma stu monet 1gr ma być równa 1zł(dla floatów  suma sto razy 0.01+0.O1+...+0.01 nie będzie równa 1.0). Platności można dokonać za pomoca pętli for w interpreterze.
 
 5. Zakup dwóch różnych biletów naraz - cena powinna być suma.
+
+6. Dodanie biletu,wrzucenie kilku monet, dodanie drugiego biletu, wrzucenie pozostalych monet, zakup za odliczoną kwotę - 
+oczekiwany brak reszty (wrzucone monety nie zeruję się po dodaniu biletu).
+
+7. Próba wrzucenia ujemnej oraz niecalkowitej liczby monet (oczekiwany komunikat o blędzie).
