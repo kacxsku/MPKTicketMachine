@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import CoinExtractor
+from Machine import Machine
 from Tickets import Tickets
 import os
 
@@ -51,6 +52,7 @@ class Page2(tk.Frame):
         self.ticket = Tickets()
         self.coinExtractor = CoinExtractor.CoinExtractor()
         self.parent = parent
+        self.machine = Machine()
         label = tk.Label(self, text="Prosze wybrać bilet:")
         label.pack(side="top")
         lb = tk.Label(self, text='', justify=tk.LEFT)
@@ -59,52 +61,19 @@ class Page2(tk.Frame):
         counter_labels = self.createCounterLabels()
         self.createButtons('+', 0.6, counter_labels)
         self.createButtons('-', 0.8, counter_labels)
-        pay_button = tk.Button(self, text="Przejdz do platnosci", relief=tk.RAISED, command=self.openPayWindow)#TODO: tutaj sume jakos licz i przekazuj do payWindow
+        pay_button = tk.Button(self, text="Przejdz do platnosci", relief=tk.RAISED, command=lambda: [self.openPayWindow(), self.takeValueFromLablesAndCalculate(counter_labels)])
+
+        #TODO: tutaj sume jakos licz i przekazuj do payWindow
         pay_button.place(relx=0.6, rely=0.9)
 
-    # sciagac value z labela i jakos przekazywac do funkcji liczacej sume pewnie petla jakas
-
-    def endMessageBox(self):
-        res = messagebox.askquestion("exit", "Czy chcesz zakończyć?")
-        if res == 'yes':
-            self.quit()
-
-    def openPayWindow(self):
-        pay_window = tk.Toplevel()
-        pay_window.resizable(False, False)
-        moneys_list = CoinExtractor.CoinExtractor.getMoneyList()
-        tk.Label(pay_window, text="Do zapłaty:"+str(0)).pack(side=tk.TOP)#self.coinExtractor.moneys_sum()#self.calculatePriceForAllTickets()
-        tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).pack(side=tk.BOTTOM)
-        tk.Label(pay_window, text="Ilość monet:").pack(side=tk.TOP)
-        var = tk.IntVar()
-        #https://stackoverflow.com/questions/44563549/tkinter-how-to-prevent-users-entering-strings-into-spin-box
-        #https://stackoverflow.com/questions/42729317/python-tkinter-spinbox-validate-fail
-        #vcmd = (self.register(self.validate_spinbox), '%P')  validatecommand=vcmd
-        moneys_count = tk.Spinbox(pay_window, from_=1, to=1000, width=10, bd=6, textvariable=var).pack(side=tk.TOP)###TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
-        spinboxValue= var.get()
-        if not isinstance(spinboxValue,int):
-            print(type(var.get()))#TODO
-        elif spinboxValue<0:
-            print('xxxx')
-            pass
-        for money in moneys_list:
-            tk.Button(pay_window, text=str(money), command=lambda m=money: self.addToCoinExtractor(m)).pack(side=tk.LEFT)
-
-
-    def validate_spinbox(self, new_value):
-        # Returning True allows the edit to happen, False prevents it.
-        return new_value.isdigit()
-##TODO:
-    def calculatePriceForAllTickets(self,buttons,labels):
-        price = 0
-        for b,l in zip(buttons,labels):
-            price+= self.ticket.getTicketPrice()
-        return  price#self.ticket.getTicketPrice()#zbierz wartosc z przyciskow*cena biletu
-
-
-    def addToCoinExtractor(self,money):#TODO: tak zeby dodawalo spinbox.get *moneta razy monete
-        newMoney = CoinExtractor.Moneta(money)
-        self.coinExtractor.add_coin(newMoney)
+    def takeValueFromLablesAndCalculate(self, counter_labels):
+        i = 0
+        for tic in Tickets.ticket:
+            value = counter_labels[i].cget("text")
+            if value != 0:
+                counter_labels[i].configure(text="0")
+                self.machine.calcualteAllChoosenTicketsPrice(tic,value)
+            i += 1
 
     def createCounterLabels(self):
         labels_list = []
@@ -127,6 +96,28 @@ class Page2(tk.Frame):
             buttons_list.append(button)
         return buttons_list
 
+    def openPayWindow(self):
+        pay_window = tk.Toplevel()
+        pay_window.resizable(False, False)
+        moneys_list = CoinExtractor.CoinExtractor.getMoneyList()
+        tk.Label(pay_window, text="Do zapłaty:"+str(self.machine.getMoneySum())).pack(side=tk.TOP)#self.coinExtractor.moneys_sum()#self.calculatePriceForAllTickets()
+        tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).pack(side=tk.BOTTOM)
+        tk.Label(pay_window, text="Ilość monet:").pack(side=tk.TOP)
+        var = tk.IntVar()
+        moneys_count = tk.Spinbox(pay_window, from_=1, to=1000, width=10, bd=6, textvariable=var).pack(side=tk.TOP)###TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
+        spinboxValue= var.get()
+        if not isinstance(spinboxValue,int):
+            print(type(var.get()))#TODO
+        elif spinboxValue<0:
+            print('xxxx')
+            pass
+        for money in moneys_list:##TODO: nie dziala jak cos monety sie dodaja ale pojedynczo    self.addToCoinExtractor(m,spinboxValue)
+            tk.Button(pay_window, text=str(money), command=lambda m=money: self.machine.calcualteAllChoosenTicketsPrice(m)).pack(side=tk.LEFT)
+
+    def endMessageBox(self):
+        res = messagebox.askquestion("exit", "Czy chcesz zakończyć?")
+        if res == 'yes':
+            self.quit()
 
 if __name__ == "__main__":
     app = Page()

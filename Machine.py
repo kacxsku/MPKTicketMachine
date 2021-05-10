@@ -1,18 +1,21 @@
+from decimal import Decimal
+
 from CoinExtractor import CoinExtractor
 from Tickets import *
 
 
-class Machine(CoinExtractor):
+class Machine(CoinExtractor,Tickets):
     _sum = 0
 
     def __init__(self):
         super().__init__()
-        pass
+        self.total_cost = 0
 
-    def buyTicket(self, ticketPrice):
-        self._sum += ticketPrice #cena biletu
 
-    def end(self):
-        self._sum = 0
-        pass
+    def calcualteAllChoosenTicketsPrice(self,choosen,value):
+        print('dupa')
+        self.total_cost += Tickets.ticket[str(choosen)]*int(value)
+        print(self.total_cost)
 
+    def getMoneySum(self):
+        return self._sum
