@@ -4,8 +4,8 @@
 
 - Windows
 ```
-git clone https://github.com/szymonszoldra/battleship.git
-cd battleship
+git clone https://github.com/kacxsku/MPKTicketMachine.git
+cd MPKTicketMachine
 py -3 -m venv venv
 venv\Scripts\activate
 pip install -r requirements.tx
@@ -13,8 +13,8 @@ pip install -r requirements.tx
 
 - Linux
 ```
-git clone https://github.com/szymonszoldra/battleship.git
-cd battleship
+git clone https://github.com/kacxsku/MPKTicketMachine.git
+cd MPKTicketMachine
 virtualenv -p python3 venv
 source venv/bin/activate
 pip install -r requirements.txt
