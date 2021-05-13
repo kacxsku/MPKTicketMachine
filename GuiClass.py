@@ -66,6 +66,7 @@ class Page2(tk.Frame):
         pay_button = tk.Button(self,
                                text="Przejdz do platnosci",
                                relief=tk.RAISED,
+                             #  state=tk.DISABLED, #TODO:MOZNA TAK ZROBIC!!!!!
                                command=lambda: [self.takeValueFromLablesAndCalculate(counter_labels),
                                                 self.openPayWindow()])
         pay_button.place(relx=0.6, rely=0.9)
@@ -106,12 +107,12 @@ class Page2(tk.Frame):
         var = tk.IntVar()
         var.set(int(self.machine.getMoneySum()))
         leftToPay_label = tk.Label(pay_window)
-        leftToPay_label.configure(text="Do zapłaty: " + str(self.machine.getMoneySum()))
-        leftToPay_label.pack(side=tk.TOP)
-        tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).pack(side=tk.BOTTOM)
-        tk.Label(pay_window, text="Ilość monet:").pack(side=tk.TOP)
+        leftToPay_label.configure(text="Do zapłaty: " + str(self.machine.getMoneySum()),font=("Arial", 20))
+        leftToPay_label.grid(row=0,column=0)
+        tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).grid(row=8,column=8)
+        tk.Label(pay_window, text="Ilość monet:",font=("Arial", 20)).grid(row=2,column=0)
         var = tk.IntVar()
-        self.coinsAmount_spinbox = tk.Spinbox(pay_window, from_=1, to=1000, width=10, bd=6, textvariable=var)
+        self.coinsAmount_spinbox = tk.Spinbox(pay_window, from_=1, to=1000, width=25, bd=6, textvariable=var)
         # TODO:::::
         spinboxValue = var.get()
         if not isinstance(spinboxValue, int):
@@ -119,21 +120,24 @@ class Page2(tk.Frame):
         elif spinboxValue < 0:
             print('xxxx')
             pass
-        for money in moneys_list:
+        for money in range(len(moneys_list)):
+            print(money)
             tk.Button(pay_window,
-                      text=str(money),
-                      command=lambda button_money = money: self.a(leftToPay_label, button_money)).pack(side=tk.LEFT)
-
-        self.coinsAmount_spinbox.pack(
-            side=tk.TOP)
+                      text=str(moneys_list[money]),
+                      width=5,###ogolnie jest problem po zmianie na grid buttony nie sa rowne !!!!
+                      command=lambda button_money = moneys_list[money]: self.a (leftToPay_label, button_money)).grid(row=1,column=money,sticky="NWES")
+        self.coinsAmount_spinbox.grid(row=2,column=4)
         # TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
 
     # TODO: ogolnie to sie ladnie zmienia ale nie liczy do konca poprawnie
     def a(self, i, money):
         i.configure(text="Do zaplaty:" + str(self.machine.substraction(
-            money * int(self.coinsAmount_spinbox.get()))))  # money jest zle!!!! caly czas 50!!!! jak to naprawic???
+            money * int(self.coinsAmount_spinbox.get()))))
 
     def endMessageBox(self):
         res = messagebox.askquestion("exit", "Czy chcesz zakończyć?")
         if res == 'yes':
             self.quit()
+
+
+#ogolnie zmienic na  grid
