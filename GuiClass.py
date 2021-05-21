@@ -145,8 +145,7 @@ class Page2(tk.Frame):
             if not change:
                 self.cantGiveChangeMessageBox()
             else:
-                print("Twoja reszta :" + str(change))
-                self.correctChangeMessageBox("Twoja reszta :" + str(change))#TODO: dodac ladne wypisywanie reszty
+                self.correctChangeMessageBox("Twoja reszta :" + str(", ".join([str(float(i)) for i in change])))
         else:
             i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
 
@@ -159,7 +158,6 @@ class Page2(tk.Frame):
         if messagebox.showwarning("showwarning", "Nie mogę wydać ci reszty\n Nie kupiłeś biletu") == "ok":
             self.quit()
 
-#*args moze ????
-    def correctChangeMessageBox(self, info):
-        if messagebox.showinfo("showinfo", info ) == "ok":
+    def correctChangeMessageBox(self,info):
+        if messagebox.showinfo("showinfo", info) == "ok":
             self.quit()

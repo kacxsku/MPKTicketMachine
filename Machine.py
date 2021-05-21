@@ -23,20 +23,15 @@ class Machine(CoinExtractor, Tickets):
 
     def returnChange(self, change):
         changeList = []
-        print(self._actuallyInMachine)
         if change in self._actuallyInMachine:
             changeList.append(change)
         else:
             for i in [float(c) for c in self._actuallyInMachine if c <= change]:
-                print(sum(changeList))
-                print(change)
-                if change==0: #nie dzziala
+                if change==0:
                     break
                 changeList.append(Decimal(str(i)))
                 change -= Decimal(str(i))
-                #print(changeList)
                 self._actuallyInMachine.remove(i)
-
             else:
                 return []
         return changeList
