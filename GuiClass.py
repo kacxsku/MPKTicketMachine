@@ -6,6 +6,7 @@ from Machine import Machine
 from Tickets import Tickets
 from decimal import *
 
+
 class Page(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -66,7 +67,7 @@ class Page2(tk.Frame):
         pay_button = tk.Button(self,
                                text="Przejdz do platnosci",
                                relief=tk.RAISED,
-                             #  state=tk.DISABLED, #TODO:MOZNA TAK ZROBIC!!!!!
+                               #  state=tk.DISABLED, #TODO:MOZNA TAK ZROBIC!!!!!
                                command=lambda: [self.takeValueFromLablesAndCalculate(counter_labels),
                                                 self.openPayWindow()])
         pay_button.place(relx=0.6, rely=0.9)
@@ -88,17 +89,20 @@ class Page2(tk.Frame):
         counter = 0
         for i in range(len(Tickets.ticket)):
             labels_list.append(tk.Label(self, text=counter))
-            labels_list[i].place(relx=0.7, rely=0.22 + i / 9.3)
+            labels_list[i].place(relx=0.7, rely=0.22 + i/9.3)
         return labels_list
 
     def changeValueOnLabel(self, i, value):  # uzyc do buttonow
         return lambda: i.configure(
-            text=str(self.opr[value](int(i.cget("text")), 1)) if int(i.cget("text")) - 1 >= 0 else i.configure(text=1))
+            text=str(self.opr[value](int(i.cget("text")), 1)) if int(
+                i.cget("text")) - 1 >= 0 else i.configure(text=1))
 
     def createButtons(self, value, relx, labels):
         return [tk.Button(self,
                           text=value,
-                          command=self.changeValueOnLabel(labels[i], value)).place(relx=relx, rely=0.22 + i / 9.3)for i in range(0, len(Tickets.ticket))]
+                          command=self.changeValueOnLabel(labels[i], value)).place(relx=relx,
+                                                                                   rely=0.22 + i/9.3) for i in
+                range(0, len(Tickets.ticket))]
 
     def openPayWindow(self):
         pay_window = tk.Toplevel()
@@ -109,7 +113,7 @@ class Page2(tk.Frame):
         leftToPay_label = tk.Label(pay_window)
         leftToPay_label.configure(text="Do zapłaty: " + str(self.machine.getMoneySum()), font=("Arial", 20))
         leftToPay_label.grid(row=0, column=0)
-        tk.Button(pay_window, text= "Zakończ transakcje", command=self.endMessageBox).grid(row=8, column=8)
+        tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).grid(row=8, column=8)
         tk.Label(pay_window, text="Ilość monet:", font=("Arial", 20)).grid(row=2, column=0)
         var = tk.IntVar()
         self.coinsAmount_spinbox = tk.Spinbox(pay_window, from_=1, to=1000, width=25, bd=6, textvariable=var)
@@ -122,33 +126,36 @@ class Page2(tk.Frame):
         for money in range(len(moneys_list)):
             tk.Button(pay_window,
                       text=str(moneys_list[money]),
-                      width=5,###ogolnie jest problem po zmianie na grid buttony nie sa rowne !!!!
-                      command=lambda button_money = moneys_list[money]: (self.calculateMoney(leftToPay_label, Decimal(button_money)),self.machine.addMoneyToMachine(Decimal(button_money))))\
-                .grid(row=1, column=money,sticky="NWES")
+                      width=5,  ###ogolnie jest problem po zmianie na grid buttony nie sa rowne !!!!
+                      command=lambda button_money=moneys_list[money]: (
+                          self.calculateMoney(leftToPay_label, Decimal(button_money)),
+                          self.machine.addMoneyToMachine(Decimal(button_money)))) \
+                .grid(row=1, column=money, sticky="NWES")
         self.coinsAmount_spinbox.grid(row=2, column=4)
         # TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
 
-
-    #tylko jedno wrzucanie monety dziala
-    # TODO: ogolnie to sie ladnie zmienia ale nie liczy do konca poprawnie
     def calculateMoney(self, i, money):
-        moneysToPay = Decimal(money * int(self.coinsAmount_spinbox.get()))
+        moneysToPay = Decimal(money*int(self.coinsAmount_spinbox.get()))
         subtractedMoneys = Decimal(self.machine.substraction(moneysToPay))
-        if subtractedMoneys >= 0:
-            i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
-        else:
+        if subtractedMoneys < 0:
             i.configure(text="Reszta:" + str(subtractedMoneys))
-            change = Decimal(self.machine.returnChange(subtractedMoneys))
+            change = self.machine.returnChange(subtractedMoneys)
             if not change:
-                print("nie moge wydac reszty")
+                cantGiveChangeMessageBox(self)
             else:
-                print("jazda")
-            #wydaj reszte tu:
-            #msbox z informacja jakie monety wydaje
+                correctChangeMessageBox(self, change)
+        else:
+            i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
 
     def endMessageBox(self):
         res = messagebox.askquestion("exit", "Czy chcesz zakończyć?")
         if res == 'yes':
             self.quit()
 
-#ogolnie zmienic na  grid
+    def cantGiveChangeMessageBox(self):
+        if messagebox.showwarning("showwarning", "Nie mogę wydać ci reszty\n nie kupiłeś biletu") == "ok":
+            self.quit()
+
+    def correctChangeMessageBox(self, change):
+        if messagebox.showinfo("showinfo", "Twoja reszta :" + change) == "ok":
+            self.quit()

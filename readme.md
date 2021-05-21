@@ -8,7 +8,7 @@ git clone https://github.com/kacxsku/MPKTicketMachine.git
 cd MPKTicketMachine
 py -3 -m venv venv
 venv\Scripts\activate
-pip install -r requirements.tx
+pip install -r requirements.txt
 ```
 
 - Linux
