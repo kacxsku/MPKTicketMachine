@@ -117,26 +117,28 @@ class Page2(tk.Frame):
         tk.Label(pay_window, text="Ilość monet:", font=("Arial", 12)).grid(row=2, column=1,columnspan=4)
         var = tk.IntVar()
         self.coinsAmount_spinbox = tk.Spinbox(pay_window, from_=1, to=1000, width=20, bd=6, textvariable=var)
-        # TODO:::::here!!!!!
-        spinboxValue = var.get()
-        if not isinstance(spinboxValue, int):
-            print(type(var.get()))  # TODO: obluzyc toooo ......................................................
-        elif spinboxValue < 0:
-            print('xxxx') #.....................................................................................
         for money in range(len(moneys_list)):
             tk.Button(pay_window,
                       text=str(moneys_list[money]),
                       width=5,
                       command=lambda button_money=moneys_list[money]: (
-                          self.fromSpinboxMoney(button_money), ##tutaj wprowadz zmiany odnosnie ilosc monet z klawiatury
+                          self.fromSpinboxMoney(button_money),
                           self.calculateMoney(leftToPay_label, Decimal(str(button_money))))) \
                 .grid(row=1, column=money, columnspan=1, sticky="NWES")
-        self.coinsAmount_spinbox.grid(row=2, column=4,columnspan=3)
-        # TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
+        self.coinsAmount_spinbox.grid(row=2, column=4, columnspan=3)
 
     def fromSpinboxMoney(self, button_money):
-        for i in range(int(self.coinsAmount_spinbox.get())):
-            self.machine.addMoneyToMachine(button_money)
+        spinboxValue = self.coinsAmount_spinbox.get()
+        try:
+            if not isinstance(int(spinboxValue), int):
+                raise SpinboxValueError("Liczba pieniędzy musi być całkowita")
+            elif int(spinboxValue) <= 0:
+                raise SpinboxValueError("Liczba pieniędzy musi być dodatnia")
+        except SpinboxValueError:
+            self.quit()
+        else:
+            for i in range(int(spinboxValue)):
+                self.machine.addMoneyToMachine(button_money)
 
     def calculateMoney(self, i, money):
         moneysToPay = Decimal(money*int(self.coinsAmount_spinbox.get()))
@@ -154,6 +156,17 @@ class Page2(tk.Frame):
         if res == 'yes':
             self.quit()
 
-    def correctChangeMessageBox(self,info):
+    def correctChangeMessageBox(self, info):
         if messagebox.showinfo("showinfo", info) == "ok":
             self.quit()
+
+
+class SpinboxValueError(Exception):
+    def __init__(self, info):
+        super().__init__(info)
+        self.errorMessagebox(info)
+
+    def errorMessagebox(self,info):
+        messagebox.showerror("showerror", info)
+
+
