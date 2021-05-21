@@ -28,8 +28,15 @@ class Machine(CoinExtractor, Tickets):
             changeList.append(change)
         else:
             for i in [float(c) for c in self._actuallyInMachine if c <= change]:
-                changeList.append(i)
-                self._actuallyInMachine.pop(i)
+                print(sum(changeList))
+                print(change)
+                if change==0: #nie dzziala
+                    break
+                changeList.append(Decimal(str(i)))
+                change -= Decimal(str(i))
+                #print(changeList)
+                self._actuallyInMachine.remove(i)
+
             else:
                 return []
         return changeList

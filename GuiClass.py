@@ -159,6 +159,7 @@ class Page2(tk.Frame):
         if messagebox.showwarning("showwarning", "Nie mogę wydać ci reszty\n Nie kupiłeś biletu") == "ok":
             self.quit()
 
+#*args moze ????
     def correctChangeMessageBox(self, info):
         if messagebox.showinfo("showinfo", info ) == "ok":
             self.quit()
