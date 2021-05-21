@@ -26,14 +26,15 @@ class Machine(CoinExtractor, Tickets):
         if change in self._actuallyInMachine:
             changeList.append(change)
         else:
-            for i in [float(c) for c in self._actuallyInMachine if c <= change]:
-                if change==0:
+            for i in [float(c) for c in self._actuallyInMachine if c <= float(change)]:
+                if change == 0:
                     break
                 changeList.append(Decimal(str(i)))
                 change -= Decimal(str(i))
                 self._actuallyInMachine.remove(i)
             else:
-                return []
+                if change != 0:
+                    return []
         return changeList
 
     def substraction(self, change):

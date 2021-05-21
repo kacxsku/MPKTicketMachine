@@ -112,27 +112,32 @@ class Page2(tk.Frame):
         var.set(int(self.machine.getMoneySum()))
         leftToPay_label = tk.Label(pay_window)
         leftToPay_label.configure(text="Do zapłaty: " + str(self.machine.getMoneySum()), font=("Arial", 20))
-        leftToPay_label.grid(row=0, column=0)
-        tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).grid(row=8, column=8)
-        tk.Label(pay_window, text="Ilość monet:", font=("Arial", 20)).grid(row=2, column=0)
+        leftToPay_label.grid(row=0, column=0,columnspan=4)
+        tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).grid(row=8, column=10,columnspan=2)
+        tk.Label(pay_window, text="Ilość monet:", font=("Arial", 12)).grid(row=2, column=1,columnspan=4)
         var = tk.IntVar()
-        self.coinsAmount_spinbox = tk.Spinbox(pay_window, from_=1, to=1000, width=25, bd=6, textvariable=var)
-        # TODO:::::
+        self.coinsAmount_spinbox = tk.Spinbox(pay_window, from_=1, to=1000, width=20, bd=6, textvariable=var)
+        # TODO:::::here!!!!!
         spinboxValue = var.get()
         if not isinstance(spinboxValue, int):
-            print(type(var.get()))  # TODO: obluzyc toooo
+            print(type(var.get()))  # TODO: obluzyc toooo ......................................................
         elif spinboxValue < 0:
-            print('xxxx')
+            print('xxxx') #.....................................................................................
         for money in range(len(moneys_list)):
             tk.Button(pay_window,
                       text=str(moneys_list[money]),
-                      width=5,  ###ogolnie jest problem po zmianie na grid buttony nie sa rowne !!!!
+                      width=5,
                       command=lambda button_money=moneys_list[money]: (
-                          self.calculateMoney(leftToPay_label, Decimal(str(button_money))),
-                          self.machine.addMoneyToMachine(button_money))) \
-                .grid(row=1, column=money, sticky="NWES")
-        self.coinsAmount_spinbox.grid(row=2, column=4)
+                          self.fromSpinboxMoney(button_money), ##tutaj wprowadz zmiany odnosnie ilosc monet z klawiatury
+                          self.calculateMoney(leftToPay_label, Decimal(str(button_money))))) \
+                .grid(row=1, column=money, columnspan=1, sticky="NWES")
+        self.coinsAmount_spinbox.grid(row=2, column=4,columnspan=3)
         # TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
+
+
+    def fromSpinboxMoney(self,button_money):
+        for i in range(int(self.coinsAmount_spinbox.get())):
+            self.machine.addMoneyToMachine(button_money)
 
     def calculateMoney(self, i, money):
         moneysToPay = Decimal(money*int(self.coinsAmount_spinbox.get()))
@@ -145,7 +150,7 @@ class Page2(tk.Frame):
             if not change:
                 self.cantGiveChangeMessageBox()
             else:
-                self.correctChangeMessageBox("Twoja reszta :" + str(", ".join([str(float(i)) for i in change])))
+                self.correctChangeMessageBox("Twoja reszta :\n" + str(", ".join([str(float(i)) for i in change])))
         else:
             i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
 
