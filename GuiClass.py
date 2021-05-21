@@ -6,6 +6,8 @@ from Machine import Machine
 from Tickets import Tickets
 from decimal import *
 
+getcontext().prec = 3
+
 
 class Page(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -83,16 +85,16 @@ class Page2(tk.Frame):
 
     def createCounterLabels(self):
         # TODO: doprowadz do tego:
-        # TODO: return  [tk.Label(self, text='0').place(relx=0.7, rely=0.22 + i / 9.3) for i in range(0,len(Tickets.ticket))]
+        # TODO:
+        #return [tk.Label(self, text='0').place(relx=0.7, rely=0.22 + i / 9.3) for i in range(0, len(Tickets.ticket))]
 
         labels_list = []
-        counter = 0
         for i in range(len(Tickets.ticket)):
-            labels_list.append(tk.Label(self, text=counter))
+            labels_list.append(tk.Label(self, text="0"))
             labels_list[i].place(relx=0.7, rely=0.22 + i/9.3)
         return labels_list
 
-    def changeValueOnLabel(self, i, value):  # uzyc do buttonow
+    def changeValueOnLabel(self, i, value):
         return lambda: i.configure(
             text=str(self.opr[value](int(i.cget("text")), 1)) if int(
                 i.cget("text")) - 1 >= 0 else i.configure(text=1))
@@ -100,9 +102,7 @@ class Page2(tk.Frame):
     def createButtons(self, value, relx, labels):
         return [tk.Button(self,
                           text=value,
-                          command=self.changeValueOnLabel(labels[i], value)).place(relx=relx,
-                                                                                   rely=0.22 + i/9.3) for i in
-                range(0, len(Tickets.ticket))]
+                          command=self.changeValueOnLabel(labels[i], value)).place(relx=relx,rely=0.22 + i/9.3) for i in range(0, len(Tickets.ticket))]
 
     def openPayWindow(self):
         pay_window = tk.Toplevel()
@@ -120,7 +120,7 @@ class Page2(tk.Frame):
         # TODO:::::
         spinboxValue = var.get()
         if not isinstance(spinboxValue, int):
-            print(type(var.get()))  # TODO
+            print(type(var.get()))  # TODO: obluzyc toooo
         elif spinboxValue < 0:
             print('xxxx')
         for money in range(len(moneys_list)):
@@ -128,8 +128,8 @@ class Page2(tk.Frame):
                       text=str(moneys_list[money]),
                       width=5,  ###ogolnie jest problem po zmianie na grid buttony nie sa rowne !!!!
                       command=lambda button_money=moneys_list[money]: (
-                          self.calculateMoney(leftToPay_label, Decimal(button_money)),
-                          self.machine.addMoneyToMachine(Decimal(button_money)))) \
+                          self.calculateMoney(leftToPay_label, Decimal(str(button_money))),
+                          self.machine.addMoneyToMachine(button_money))) \
                 .grid(row=1, column=money, sticky="NWES")
         self.coinsAmount_spinbox.grid(row=2, column=4)
         # TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
@@ -137,13 +137,16 @@ class Page2(tk.Frame):
     def calculateMoney(self, i, money):
         moneysToPay = Decimal(money*int(self.coinsAmount_spinbox.get()))
         subtractedMoneys = Decimal(self.machine.substraction(moneysToPay))
-        if subtractedMoneys < 0:
+        if subtractedMoneys == 0:
+            self.correctChangeMessageBox("Kupiłeś bilet za odliczoną kwotę")
+        elif subtractedMoneys < 0:
             i.configure(text="Reszta:" + str(subtractedMoneys))
-            change = self.machine.returnChange(subtractedMoneys)
+            change = self.machine.returnChange(-subtractedMoneys)
             if not change:
-                cantGiveChangeMessageBox(self)
+                self.cantGiveChangeMessageBox()
             else:
-                correctChangeMessageBox(self, change)
+                print("Twoja reszta :" + str(change))
+                self.correctChangeMessageBox("Twoja reszta :" + str(change))#TODO: dodac ladne wypisywanie reszty
         else:
             i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
 
@@ -153,9 +156,9 @@ class Page2(tk.Frame):
             self.quit()
 
     def cantGiveChangeMessageBox(self):
-        if messagebox.showwarning("showwarning", "Nie mogę wydać ci reszty\n nie kupiłeś biletu") == "ok":
+        if messagebox.showwarning("showwarning", "Nie mogę wydać ci reszty\n Nie kupiłeś biletu") == "ok":
             self.quit()
 
-    def correctChangeMessageBox(self, change):
-        if messagebox.showinfo("showinfo", "Twoja reszta :" + change) == "ok":
+    def correctChangeMessageBox(self, info):
+        if messagebox.showinfo("showinfo", info ) == "ok":
             self.quit()
