@@ -11,3 +11,4 @@ if __name__ == "__main__":
 # dodaj funkcjonalnosci
 # podziel na moduly
 # podziel na pakiety
+
