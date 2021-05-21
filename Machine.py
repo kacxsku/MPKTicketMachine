@@ -34,8 +34,8 @@ class Machine(CoinExtractor, Tickets):
                 self._actuallyInMachine.remove(i)
             else:
                 if change != 0:
-                    return []
-        return changeList
+                    return "Nie mogę wydać ci reszty\n Nie kupiłeś biletu\n oddaje:"+str(", ".join([str(float(i)) for i in changeList]))
+        return "Kupiles bilet\nTwoja reszta :\n" + str(", ".join([str(float(i)) for i in changeList]))
 
     def substraction(self, change):
         self._total_cost = Decimal(str(self._total_cost)) - Decimal(str(change))

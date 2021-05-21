@@ -69,7 +69,7 @@ class Page2(tk.Frame):
         pay_button = tk.Button(self,
                                text="Przejdz do platnosci",
                                relief=tk.RAISED,
-                               #  state=tk.DISABLED, #TODO:MOZNA TAK ZROBIC!!!!!
+                              # state=tk.DISABLED, #TODO:MOZNA TAK ZROBIC!!!!!
                                command=lambda: [self.takeValueFromLablesAndCalculate(counter_labels),
                                                 self.openPayWindow()])
         pay_button.place(relx=0.6, rely=0.9)
@@ -102,7 +102,7 @@ class Page2(tk.Frame):
     def createButtons(self, value, relx, labels):
         return [tk.Button(self,
                           text=value,
-                          command=self.changeValueOnLabel(labels[i], value)).place(relx=relx,rely=0.22 + i/9.3) for i in range(0, len(Tickets.ticket))]
+                          command=self.changeValueOnLabel(labels[i], value)).place(relx=relx, rely=0.22 + i/9.3) for i in range(0, len(Tickets.ticket))]
 
     def openPayWindow(self):
         pay_window = tk.Toplevel()
@@ -112,7 +112,7 @@ class Page2(tk.Frame):
         var.set(int(self.machine.getMoneySum()))
         leftToPay_label = tk.Label(pay_window)
         leftToPay_label.configure(text="Do zapłaty: " + str(self.machine.getMoneySum()), font=("Arial", 20))
-        leftToPay_label.grid(row=0, column=0,columnspan=4)
+        leftToPay_label.grid(row=0, column=0, columnspan=4)
         tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).grid(row=8, column=10,columnspan=2)
         tk.Label(pay_window, text="Ilość monet:", font=("Arial", 12)).grid(row=2, column=1,columnspan=4)
         var = tk.IntVar()
@@ -134,8 +134,7 @@ class Page2(tk.Frame):
         self.coinsAmount_spinbox.grid(row=2, column=4,columnspan=3)
         # TODO:Dynamicznie sprawdzac wartosc tego !!!! nie moze byc <0 i musi byc int
 
-
-    def fromSpinboxMoney(self,button_money):
+    def fromSpinboxMoney(self, button_money):
         for i in range(int(self.coinsAmount_spinbox.get())):
             self.machine.addMoneyToMachine(button_money)
 
@@ -146,21 +145,13 @@ class Page2(tk.Frame):
             self.correctChangeMessageBox("Kupiłeś bilet za odliczoną kwotę")
         elif subtractedMoneys < 0:
             i.configure(text="Reszta:" + str(subtractedMoneys))
-            change = self.machine.returnChange(-subtractedMoneys)
-            if not change:
-                self.cantGiveChangeMessageBox()
-            else:
-                self.correctChangeMessageBox("Twoja reszta :\n" + str(", ".join([str(float(i)) for i in change])))
+            self.correctChangeMessageBox(self.machine.returnChange(-subtractedMoneys))
         else:
             i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
 
     def endMessageBox(self):
         res = messagebox.askquestion("exit", "Czy chcesz zakończyć?")
         if res == 'yes':
-            self.quit()
-
-    def cantGiveChangeMessageBox(self):
-        if messagebox.showwarning("showwarning", "Nie mogę wydać ci reszty\n Nie kupiłeś biletu") == "ok":
             self.quit()
 
     def correctChangeMessageBox(self,info):
