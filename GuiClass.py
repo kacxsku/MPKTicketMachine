@@ -5,6 +5,7 @@ from tkinter import messagebox
 from Machine import Machine
 from Tickets import Tickets
 from decimal import *
+from exceptions import *
 
 getcontext().prec = 3
 
@@ -69,7 +70,6 @@ class Page2(tk.Frame):
         pay_button = tk.Button(self,
                                text="Przejdz do platnosci",
                                relief=tk.RAISED,
-                              # state=tk.DISABLED, #TODO:MOZNA TAK ZROBIC!!!!!
                                command=lambda: [self.takeValueFromLablesAndCalculate(counter_labels),
                                                 self.openPayWindow()])
         pay_button.place(relx=0.6, rely=0.9)
@@ -84,10 +84,6 @@ class Page2(tk.Frame):
             i += 1
 
     def createCounterLabels(self):
-        # TODO: doprowadz do tego:
-        # TODO:
-        #return [tk.Label(self, text='0').place(relx=0.7, rely=0.22 + i / 9.3) for i in range(0, len(Tickets.ticket))]
-
         labels_list = []
         for i in range(len(Tickets.ticket)):
             labels_list.append(tk.Label(self, text="0"))
@@ -102,7 +98,8 @@ class Page2(tk.Frame):
     def createButtons(self, value, relx, labels):
         return [tk.Button(self,
                           text=value,
-                          command=self.changeValueOnLabel(labels[i], value)).place(relx=relx, rely=0.22 + i/9.3) for i in range(0, len(Tickets.ticket))]
+                          command=self.changeValueOnLabel(labels[i], value))
+                    .place(relx=relx, rely=0.22 + i/9.3) for i in range(0, len(Tickets.ticket))]
 
     def openPayWindow(self):
         pay_window = tk.Toplevel()
@@ -130,11 +127,12 @@ class Page2(tk.Frame):
     def fromSpinboxMoney(self, button_money):
         spinboxValue = self.coinsAmount_spinbox.get()
         try:
-            if not isinstance(int(spinboxValue), int):
-                raise SpinboxValueError("Liczba pieniędzy musi być całkowita")
-            elif int(spinboxValue) <= 0:
-                raise SpinboxValueError("Liczba pieniędzy musi być dodatnia")
-        except SpinboxValueError:
+            self.machine.checkValue(spinboxValue)
+        except NegativeNumberValueError:
+            messagebox.showerror("showerror", "Liczba pieniędzy musi być dodatnia")
+            self.quit()
+        except NotIntValueError:
+            messagebox.showerror("showerror", "Liczba pieniędzy musi być całkowita")
             self.quit()
         else:
             for i in range(int(spinboxValue)):
@@ -143,11 +141,12 @@ class Page2(tk.Frame):
     def calculateMoney(self, i, money):
         moneysToPay = Decimal(money*int(self.coinsAmount_spinbox.get()))
         subtractedMoneys = Decimal(self.machine.substraction(moneysToPay))
+        change_info = self.machine.returnChange(-subtractedMoneys)
         if subtractedMoneys == 0:
-            self.correctChangeMessageBox("Kupiłeś bilet za odliczoną kwotę")
+            self.correctChangeMessageBox(change_info)
         elif subtractedMoneys < 0:
             i.configure(text="Reszta:" + str(subtractedMoneys))
-            self.correctChangeMessageBox(self.machine.returnChange(-subtractedMoneys))
+            self.correctChangeMessageBox(change_info)
         else:
             i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
 
@@ -161,12 +160,6 @@ class Page2(tk.Frame):
             self.quit()
 
 
-class SpinboxValueError(Exception):
-    def __init__(self, info):
-        super().__init__(info)
-        self.errorMessagebox(info)
 
-    def errorMessagebox(self,info):
-        messagebox.showerror("showerror", info)
 
 

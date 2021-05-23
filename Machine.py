@@ -1,7 +1,7 @@
 from CoinExtractor import CoinExtractor
 from Tickets import *
 from decimal import *
-
+from exceptions import *
 getcontext().prec = 3
 
 class Machine(CoinExtractor, Tickets):
@@ -33,10 +33,19 @@ class Machine(CoinExtractor, Tickets):
                 change -= Decimal(str(i))
                 self._actuallyInMachine.remove(i)
             else:
-                if change != 0:
+                if change == 0:
+                    return "Kupiłeś bilet za odliczoną kwotę"
+                elif change != 0:
                     return "Nie mogę wydać ci reszty\n Nie kupiłeś biletu\n oddaje:"+str(", ".join([str(float(i)) for i in changeList]))
-        return "Kupiles bilet\nTwoja reszta :\n" + str(", ".join([str(float(i)) for i in changeList]))
+        return "Twoja reszta :\n" + str(", ".join([str(float(i)) for i in changeList]))
 
     def substraction(self, change):
         self._total_cost = Decimal(str(self._total_cost)) - Decimal(str(change))
         return Decimal(str(self._total_cost))
+
+    def checkValue(self, spinboxValue):
+            if not isinstance(int(spinboxValue), int): #error
+                raise NotIntValueError()
+            elif int(spinboxValue) <= 0:
+                raise NegativeNumberValueError()
+
