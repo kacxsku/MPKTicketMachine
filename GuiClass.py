@@ -37,6 +37,7 @@ class Page1(tk.Frame):
         label = tk.Label(self, text="Witaj W automacie biletowym")
         label.pack(side="top", fill="both", expand=True)
         tk.Frame(self)
+        # printing image in frame
         dir_path = os.path.dirname(__file__)
         canvas = tk.Canvas(self, width=340, height=250)
         canvas.pack()
@@ -50,6 +51,7 @@ class Page1(tk.Frame):
 
 
 class Page2(tk.Frame):
+    """when operator is string"""
     opr = {"+": (lambda x, y: x + y),
            "-": (lambda x, y: x - y)}
 
@@ -70,11 +72,11 @@ class Page2(tk.Frame):
         pay_button = tk.Button(self,
                                text="Przejdz do platnosci",
                                relief=tk.RAISED,
-                               command=lambda: [self.takeValueFromLablesAndCalculate(counter_labels),
+                               command=lambda: [self.takeValueFromLabelsAndCalculate(counter_labels),
                                                 self.openPayWindow()])
         pay_button.place(relx=0.6, rely=0.9)
 
-    def takeValueFromLablesAndCalculate(self, counter_labels):
+    def takeValueFromLabelsAndCalculate(self, counter_labels):
         i = 0
         for tic in Tickets.ticket:
             value = counter_labels[i].cget("text")
@@ -98,8 +100,7 @@ class Page2(tk.Frame):
     def createButtons(self, value, relx, labels):
         return [tk.Button(self,
                           text=value,
-                          command=self.changeValueOnLabel(labels[i], value))
-                    .place(relx=relx, rely=0.22 + i/9.3) for i in range(0, len(Tickets.ticket))]
+                          command=self.changeValueOnLabel(labels[i], value)).place(relx=relx, rely=0.22 + i/9.3) for i in range(0, len(Tickets.ticket))]
 
     def openPayWindow(self):
         pay_window = tk.Toplevel()
@@ -151,11 +152,13 @@ class Page2(tk.Frame):
             i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
 
     def endMessageBox(self):
+        '''showing exit messagebox'''
         res = messagebox.askquestion("exit", "Czy chcesz zakończyć?")
         if res == 'yes':
             self.quit()
 
     def correctChangeMessageBox(self, info):
+        '''showing change message box'''
         if messagebox.showinfo("showinfo", info) == "ok":
             self.quit()
 
