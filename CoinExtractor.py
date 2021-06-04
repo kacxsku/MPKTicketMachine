@@ -2,7 +2,9 @@ from decimal import Decimal
 from Tickets import *
 
 class CoinExtractor(Tickets):
-    """All available moneys"""
+    """class for moneys operation"""
+
+    #All available moneys
     _moneys = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0]
 
 
@@ -16,9 +18,6 @@ class CoinExtractor(Tickets):
     def getMoneySum(self):
         '''return money sum of total cost'''
         return Decimal(str(self._total_cost))
-
-
-
 
     def getMoneyList(self):
         '''return available moneys list'''

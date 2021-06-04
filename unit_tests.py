@@ -58,7 +58,13 @@ class MyTestCase(unittest.TestCase):
         with self.assertRaises(NegativeNumberValueError):
             machine.checkValue("-1")
 
-
+    def test_should_correctly_return_price(self):
+        machine = Machine()
+        machine.calculateAllChosenTicketsPrice("20 min ulgowy", '1')
+        machine.addMoneyToMachine('1')
+        machine.calculateAllChosenTicketsPrice("20 min ulgowy", '1')
+        substracted_moneys = Decimal(machine.substraction('1'))
+        self.assertEqual(Decimal(str(3)), machine.getTotalCost())
 
 if __name__ == '__main__':
     unittest.main()

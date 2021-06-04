@@ -48,6 +48,9 @@ class Machine(CoinExtractor, Tickets):
     def setTotalCost(self,value):
         self._total_cost = decimal(str(value))
 
+    def getTotalCost(self):
+        return self._total_cost
+
     def addMoneyToMachine(self, money):
         '''add thrown into machine moneys to list'''
         self._actuallyInMachine.append(Decimal(str(money)))
