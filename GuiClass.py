@@ -132,6 +132,8 @@ class Page2(tk.Frame):
                           self.calculateMoney(leftToPay_label, Decimal(str(button_money)),pay_window))) \
                 .grid(row=1, column=money, columnspan=1, sticky="NWES")
         self.coinsAmount_spinbox.grid(row=2, column=4, columnspan=3)
+        self.machine.setRecenlty()
+
 
     def fromSpinboxMoney(self, button_money):
         '''checking if exception was thrown and printing proper messagebox, else adding moneys to machine'''
@@ -145,7 +147,7 @@ class Page2(tk.Frame):
             messagebox.showerror("showerror", "Liczba pieniędzy musi być całkowita")
             self.quit()
         else:
-            for i in range(int(spinboxValue)):
+            for _ in range(int(spinboxValue)):
                 self.machine.addMoneyToMachine(button_money)
 
     def calculateMoney(self, i, money,top):
@@ -154,10 +156,10 @@ class Page2(tk.Frame):
         subtractedMoneys = Decimal(self.machine.substraction(moneysToPay))
         change_info = self.machine.returnChange(-subtractedMoneys)
         if subtractedMoneys == 0:
-            self.correctChangeMessageBox(change_info,top)
+            self.correctChangeMessageBox(change_info,top,i)
         elif subtractedMoneys < 0:
             i.configure(text="Reszta:" + str(subtractedMoneys))
-            self.correctChangeMessageBox(change_info,top)
+            self.correctChangeMessageBox(change_info,top,i)
         else:
             i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
 
@@ -167,12 +169,12 @@ class Page2(tk.Frame):
         if res == 'yes':
             self.quit()
 
-    def correctChangeMessageBox(self, info,top):
+    def correctChangeMessageBox(self, info,top,i):
         '''showing change message box'''
         if messagebox.showinfo("showinfo", info) == "ok":
             top.destroy()
             top.update()
-
+            self.machine.setTotalCost(0)
 
 
 

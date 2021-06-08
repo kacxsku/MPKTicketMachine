@@ -15,26 +15,30 @@ class Machine(CoinExtractor, Tickets):
         self.coinExtractor = CoinExtractor()
         self._actuallyInMachine = []
         self._recently_added_coins = []
+        self._total_cost = Decimal(str(0))
 
     def returnChange(self, change):
         '''algorithm for spending the change, returns string displayed on message box after transaction'''
         changeList = []
-        if change in self._actuallyInMachine:
-            changeList.append(change)
+        print(self._actuallyInMachine)
+        for i in [float(c) for c in sorted(self._actuallyInMachine,reverse=True) if c <= float(change)]:
+            changeList.append(Decimal(str(i)))
+            change -= Decimal(str(i))
+            if change == 0:
+                for i in self._actuallyInMachine:
+                    if i in changeList:
+                        self._actuallyInMachine.remove(i)
+                return "Twoja reszta :\n" + str(", ".join([str(float(i)) for i in changeList]))
         else:
-            for i in [float(c) for c in self._actuallyInMachine if c <= float(change)]:
-                if change == 0:
-                    break
-                changeList.append(Decimal(str(i)))
-                change -= Decimal(str(i))
-                # self._actuallyInMachine.remove(i)
-            else:
-                if change == 0 and len(changeList) == 0:
-                    self._actuallyInMachine = [i for i in self._actuallyInMachine if i not in changeList]
-                    return "Kupiłeś bilet za odliczoną kwotę"
-                elif change != 0:
-                    return "Nie mogę wydać ci reszty\n Nie kupiłeś biletu\n oddaje:"+str(", ".join([str(float(i)) for i in self._recently_added_coins]))
-        return "Twoja reszta :\n" + str(", ".join([str(float(i)) for i in changeList]))
+            if change == Decimal(str(0)) and len(changeList) == Decimal(str(0)):
+                return "Kupiłeś bilet za odliczoną kwotę"
+            elif change > 0 :
+                for i in self._recently_added_coins:
+                    if i in self._actuallyInMachine:
+                        self._actuallyInMachine.remove(i)
+                return "Nie mogę wydać ci reszty\n Nie kupiłeś biletu\n oddaje: " + str(
+                    ", ".join([str(float(i)) for i in self._recently_added_coins]))
+
 
     def checkValue(self, spinboxValue):
             '''Check if value from spinbox is inteeger value or if it's negative number'''
@@ -47,7 +51,7 @@ class Machine(CoinExtractor, Tickets):
 
     def setTotalCost(self,value):
         '''set total cost of tickets'''
-        self._total_cost = decimal(str(value))
+        self._total_cost = Decimal(str(value))
 
     def getTotalCost(self):
         '''get total cost of tickets'''
@@ -56,10 +60,11 @@ class Machine(CoinExtractor, Tickets):
     def addMoneyToMachine(self, money):
         '''add thrown into machine moneys to list'''
         self._actuallyInMachine.append(Decimal(str(money)))
-        self._recently_added_coins.append(str(money))
+        self._recently_added_coins.append(Decimal(str(money)))
 
     def getAcctuallyInMachineSum(self):
         '''get sum of money in macjine'''
         return sum(self._actuallyInMachine)
 
-
+    def setRecenlty(self):
+        self._recently_added_coins = []
