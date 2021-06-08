@@ -46,9 +46,11 @@ class Machine(CoinExtractor, Tickets):
                 raise NegativeNumberValueError()
 
     def setTotalCost(self,value):
+        '''set total cost of tickets'''
         self._total_cost = decimal(str(value))
 
     def getTotalCost(self):
+        '''get total cost of tickets'''
         return self._total_cost
 
     def addMoneyToMachine(self, money):
@@ -57,6 +59,7 @@ class Machine(CoinExtractor, Tickets):
         self._recently_added_coins.append(str(money))
 
     def getAcctuallyInMachineSum(self):
+        '''get sum of money in macjine'''
         return sum(self._actuallyInMachine)
 
 

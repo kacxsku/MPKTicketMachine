@@ -11,6 +11,7 @@ getcontext().prec = 3
 
 
 class Page(tk.Tk):
+    """Parent Page for other Pages"""
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         container = tk.Frame(self)
@@ -31,6 +32,7 @@ class Page(tk.Tk):
 
 
 class Page1(tk.Frame):
+    """Ticket Machine Home page"""
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
@@ -51,7 +53,8 @@ class Page1(tk.Frame):
 
 
 class Page2(tk.Frame):
-    """when operator is string"""
+    """frame for chosing tickets and operations on it"""
+    #when operator is string
     opr = {"+": (lambda x, y: x + y),
            "-": (lambda x, y: x - y)}
 
@@ -77,6 +80,7 @@ class Page2(tk.Frame):
         pay_button.place(relx=0.6, rely=0.9)
 
     def takeValueFromLabelsAndCalculate(self, counter_labels):
+        """take value from label and calculate moneys"""
         i = 0
         for tic in Tickets.ticket:
             value = counter_labels[i].cget("text")
@@ -86,6 +90,7 @@ class Page2(tk.Frame):
             i += 1
 
     def createCounterLabels(self):
+        '''creating labels with tickets amount'''
         labels_list = []
         for i in range(len(Tickets.ticket)):
             labels_list.append(tk.Label(self, text="0"))
@@ -93,16 +98,19 @@ class Page2(tk.Frame):
         return labels_list
 
     def changeValueOnLabel(self, i, value):
+        '''change value on counter label'''
         return lambda: i.configure(
             text=str(self.opr[value](int(i.cget("text")), 1)) if int(
                 i.cget("text")) - 1 >= 0 else i.configure(text=1))
 
     def createButtons(self, value, relx, labels):
+        '''create buttons for changing tickets count'''
         return [tk.Button(self,
                           text=value,
                           command=self.changeValueOnLabel(labels[i], value)).place(relx=relx, rely=0.22 + i/9.3) for i in range(0, len(Tickets.ticket))]
 
     def openPayWindow(self):
+        '''create pay window and operations on coins'''
         pay_window = tk.Toplevel()
         pay_window.resizable(False, False)
         moneys_list = self.coinExtractor.getMoneyList()
@@ -121,11 +129,12 @@ class Page2(tk.Frame):
                       width=5,
                       command=lambda button_money=moneys_list[money]: (
                           self.fromSpinboxMoney(button_money),
-                          self.calculateMoney(leftToPay_label, Decimal(str(button_money))))) \
+                          self.calculateMoney(leftToPay_label, Decimal(str(button_money)),pay_window))) \
                 .grid(row=1, column=money, columnspan=1, sticky="NWES")
         self.coinsAmount_spinbox.grid(row=2, column=4, columnspan=3)
 
     def fromSpinboxMoney(self, button_money):
+        '''checking if exception was thrown and printing proper messagebox, else adding moneys to machine'''
         spinboxValue = self.coinsAmount_spinbox.get()
         try:
             self.machine.checkValue(spinboxValue)
@@ -139,15 +148,16 @@ class Page2(tk.Frame):
             for i in range(int(spinboxValue)):
                 self.machine.addMoneyToMachine(button_money)
 
-    def calculateMoney(self, i, money):
+    def calculateMoney(self, i, money,top):
+        '''calculate moneys to pay, and printing propert messagebox'''
         moneysToPay = Decimal(money*int(self.coinsAmount_spinbox.get()))
         subtractedMoneys = Decimal(self.machine.substraction(moneysToPay))
         change_info = self.machine.returnChange(-subtractedMoneys)
         if subtractedMoneys == 0:
-            self.correctChangeMessageBox(change_info)
+            self.correctChangeMessageBox(change_info,top)
         elif subtractedMoneys < 0:
             i.configure(text="Reszta:" + str(subtractedMoneys))
-            self.correctChangeMessageBox(change_info)
+            self.correctChangeMessageBox(change_info,top)
         else:
             i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
 
@@ -157,11 +167,11 @@ class Page2(tk.Frame):
         if res == 'yes':
             self.quit()
 
-    def correctChangeMessageBox(self, info):
+    def correctChangeMessageBox(self, info,top):
         '''showing change message box'''
         if messagebox.showinfo("showinfo", info) == "ok":
-            self.quit()
-
+            top.destroy()
+            top.update()
 
 
 
