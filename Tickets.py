@@ -1,9 +1,8 @@
 
 
 class Tickets:
-    """Class for representing tickets and it values"""
-    def __init__(self):
-        _ticket = {"20 min ulgowy": 2,
+    """class for representing tickets and its value"""
+    ticket = {"20 min ulgowy": 2,
                              "20 min normalny": 4,
                              "40 min ulgowy": 3,
                              "40 min normalny": 5.50,

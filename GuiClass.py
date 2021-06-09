@@ -154,9 +154,9 @@ class Page2(tk.Frame):
         moneysToPay = Decimal(money*int(self.coinsAmount_spinbox.get()))
         subtractedMoneys = Decimal(self.machine.substraction(moneysToPay))
         change_info = self.machine.returnChange(-subtractedMoneys)
-        self.showProperMsBox(change_info, top, i)
+        self.showProperMsBox(change_info, top, i, subtractedMoneys)
 
-    def showProperMsBox(self, change_info, top, i):
+    def showProperMsBox(self, change_info, top, i, subtractedMoneys):
         '''show proper message box on value'''
         if subtractedMoneys == 0:
             self.correctChangeMessageBox(change_info, top)
