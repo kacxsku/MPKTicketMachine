@@ -12,7 +12,7 @@ class Machine(CoinExtractor, Tickets):
     def __init__(self):
         super().__init__()
         self.coinExtractor = CoinExtractor()
-        self._actuallyInMachine = []
+        self._actuallyInMachine = [Decimal(str(1.0)), Decimal(str(2.0))]
         self._recently_added_coins = []
         self._total_cost = Decimal(str(0))
 
@@ -24,10 +24,10 @@ class Machine(CoinExtractor, Tickets):
             changeList.append(Decimal(str(i)))
             change -= Decimal(str(i))
             if change == 0:
-                for k in self._actuallyInMachine:
-                    if k in changeList:
-                        self._actuallyInMachine.remove(k)
+                self._actuallyInMachine = [Decimal(str(k)) for k in self._actuallyInMachine if k not in changeList]
                 return "Twoja reszta :\n" + str(", ".join([str(float(i)) for i in changeList]))
+            if change <0:
+                break
         else:
             if change == Decimal(str(0)) and len(changeList) == Decimal(str(0)):
                 return "Kupiłeś bilet za odliczoną kwotę"
@@ -67,3 +67,7 @@ class Machine(CoinExtractor, Tickets):
 
     def setRecenlty(self):
         self._recently_added_coins = []
+
+    def clearList(self):
+        '''helper for tests'''
+        self._actuallyInMachine =[]

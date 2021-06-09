@@ -175,7 +175,7 @@ class Page2(tk.Frame):
     def correctChangeMessageBox(self, info, top):
         '''showing message box with change info'''
         if messagebox.showinfo("showinfo", info) == "ok":
-            #closing Toplevel
+            # closing Toplevel
             top.destroy()
             top.update()
             self.machine.setTotalCost(0)
@@ -183,4 +183,5 @@ class Page2(tk.Frame):
     def errorMessageBox(self, info):
         '''showing error message box when my own valueErrors are throwen'''
         if messagebox.showerror("showerror", info) == "ok":
-            self.quit()
+            pass
+            # self.quit()
