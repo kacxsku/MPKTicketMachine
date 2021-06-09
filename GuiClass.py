@@ -107,7 +107,8 @@ class Page2(tk.Frame):
         '''create buttons for changing tickets count'''
         return [tk.Button(self,
                           text=value,
-                          command=self.changeValueOnLabel(labels[i], value)).place(relx=relx, rely=0.22 + i/9.3) for i in range(0, len(Tickets.ticket))]
+                          command=self.changeValueOnLabel(labels[i], value)).place(relx=relx, rely=0.22 + i/9.3)
+                for i in range(0, len(Tickets.ticket))]
 
     def openPayWindow(self):
         '''create pay window and operations on coins'''
@@ -119,8 +120,9 @@ class Page2(tk.Frame):
         leftToPay_label = tk.Label(pay_window)
         leftToPay_label.configure(text="Do zapłaty: " + str(self.machine.getMoneySum()), font=("Arial", 20))
         leftToPay_label.grid(row=0, column=0, columnspan=4)
-        tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox).grid(row=8, column=10,columnspan=2)
-        tk.Label(pay_window, text="Ilość monet:", font=("Arial", 12)).grid(row=2, column=1,columnspan=4)
+        tk.Button(pay_window, text="Zakończ transakcje", command=self.endMessageBox)\
+            .grid(row=8, column=10, columnspan=2)
+        tk.Label(pay_window, text="Ilość monet:", font=("Arial", 12)).grid(row=2, column=1, columnspan=4)
         var = tk.IntVar()
         self.coinsAmount_spinbox = tk.Spinbox(pay_window, from_=1, to=1000, width=20, bd=6, textvariable=var)
         for money in range(len(moneys_list)):
@@ -129,11 +131,10 @@ class Page2(tk.Frame):
                       width=5,
                       command=lambda button_money=moneys_list[money]: (
                           self.fromSpinboxMoney(button_money),
-                          self.calculateMoney(leftToPay_label, Decimal(str(button_money)),pay_window))) \
+                          self.calculateMoney(leftToPay_label, Decimal(str(button_money)), pay_window))) \
                 .grid(row=1, column=money, columnspan=1, sticky="NWES")
         self.coinsAmount_spinbox.grid(row=2, column=4, columnspan=3)
         self.machine.setRecenlty()
-
 
     def fromSpinboxMoney(self, button_money):
         '''checking if exception was thrown and printing proper messagebox, else adding moneys to machine'''
@@ -141,25 +142,29 @@ class Page2(tk.Frame):
         try:
             self.machine.checkValue(spinboxValue)
         except NegativeNumberValueError:
-            messagebox.showerror("showerror", "Liczba pieniędzy musi być dodatnia")
-            self.quit()
+            self.errorMessageBox("Liczba pieniędzy musi być dodatnia")
         except NotIntValueError:
-            messagebox.showerror("showerror", "Liczba pieniędzy musi być całkowita")
-            self.quit()
+            self.errorMessageBox("Liczba pieniędzy musi być całkowita")
         else:
             for _ in range(int(spinboxValue)):
                 self.machine.addMoneyToMachine(button_money)
 
-    def calculateMoney(self, i, money,top):
+
+
+    def calculateMoney(self, i, money, top):
         '''calculate moneys to pay, and printing propert messagebox'''
         moneysToPay = Decimal(money*int(self.coinsAmount_spinbox.get()))
         subtractedMoneys = Decimal(self.machine.substraction(moneysToPay))
         change_info = self.machine.returnChange(-subtractedMoneys)
+        self.showProperMsBox(change_info, top, i)
+
+    def showProperMsBox(self,change_info, top, i):
+        '''show proper message box on value'''
         if subtractedMoneys == 0:
-            self.correctChangeMessageBox(change_info,top,i)
+            self.correctChangeMessageBox(change_info, top)
         elif subtractedMoneys < 0:
             i.configure(text="Reszta:" + str(subtractedMoneys))
-            self.correctChangeMessageBox(change_info,top,i)
+            self.correctChangeMessageBox(change_info, top)
         else:
             i.configure(text="Do zaplaty:" + str(Decimal(subtractedMoneys)))
 
@@ -169,12 +174,14 @@ class Page2(tk.Frame):
         if res == 'yes':
             self.quit()
 
-    def correctChangeMessageBox(self, info,top,i):
+    def correctChangeMessageBox(self, info, top):
         '''showing change message box'''
         if messagebox.showinfo("showinfo", info) == "ok":
             top.destroy()
             top.update()
             self.machine.setTotalCost(0)
 
-
-
+    def errorMessageBox(self, info):
+        '''showing error message box when my own valueErrors are throwen'''
+        if messagebox.showerror("showerror", info) == "ok":
+            self.quit()

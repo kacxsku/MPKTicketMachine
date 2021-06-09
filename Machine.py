@@ -9,7 +9,6 @@ getcontext().prec = 3
 class Machine(CoinExtractor, Tickets):
     """class representing ticket machine"""
 
-
     def __init__(self):
         super().__init__()
         self.coinExtractor = CoinExtractor()
@@ -21,35 +20,35 @@ class Machine(CoinExtractor, Tickets):
         '''algorithm for spending the change, returns string displayed on message box after transaction'''
         changeList = []
         print(self._actuallyInMachine)
-        for i in [float(c) for c in sorted(self._actuallyInMachine,reverse=True) if c <= float(change)]:
+        for i in [float(c) for c in sorted(self._actuallyInMachine, reverse=True) if c <= float(change)]:
             changeList.append(Decimal(str(i)))
             change -= Decimal(str(i))
             if change == 0:
-                for i in self._actuallyInMachine:
-                    if i in changeList:
-                        self._actuallyInMachine.remove(i)
+                for k in self._actuallyInMachine:
+                    if k in changeList:
+                        self._actuallyInMachine.remove(k)
                 return "Twoja reszta :\n" + str(", ".join([str(float(i)) for i in changeList]))
         else:
             if change == Decimal(str(0)) and len(changeList) == Decimal(str(0)):
                 return "Kupiłeś bilet za odliczoną kwotę"
-            elif change > 0 :
+            elif change > 0:
                 for i in self._recently_added_coins:
                     if i in self._actuallyInMachine:
                         self._actuallyInMachine.remove(i)
                 return "Nie mogę wydać ci reszty\n Nie kupiłeś biletu\n oddaje: " + str(
                     ", ".join([str(float(i)) for i in self._recently_added_coins]))
 
+    @staticmethod
+    def checkValue(spinboxValue):
+        '''Check if value from spinbox is inteeger value or if it's negative number'''
+        try:
+            int(spinboxValue)
+        except ValueError:
+            raise NotIntValueError()
+        if int(spinboxValue) <= 0:
+            raise NegativeNumberValueError()
 
-    def checkValue(self, spinboxValue):
-            '''Check if value from spinbox is inteeger value or if it's negative number'''
-            try:
-                int(spinboxValue)
-            except ValueError:
-                raise NotIntValueError()
-            if int(spinboxValue) <= 0:
-                raise NegativeNumberValueError()
-
-    def setTotalCost(self,value):
+    def setTotalCost(self, value):
         '''set total cost of tickets'''
         self._total_cost = Decimal(str(value))
 

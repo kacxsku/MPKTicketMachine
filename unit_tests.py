@@ -35,10 +35,10 @@ class MyTestCase(unittest.TestCase):
         machine = Machine()
         machine.calculateAllChosenTicketsPrice("20 min ulgowy", '1')
         machine.addMoneyToMachine('1')
-        substracted_moneys = Decimal(machine.substraction('1'))
+        Decimal(machine.substraction('1'))
         machine.addMoneyToMachine('5')
         substracted_moneys = Decimal(machine.substraction('5'))
-        self.assertEqual("Nie mogę wydać ci reszty\n Nie kupiłeś biletu\n oddaje:1.0, 5.0",
+        self.assertEqual("Nie mogę wydać ci reszty\n Nie kupiłeś biletu\n oddaje: 1.0, 5.0",
                          machine.returnChange(-substracted_moneys))
 
     def test_adding(self):
