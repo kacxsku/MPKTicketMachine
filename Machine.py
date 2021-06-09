@@ -19,7 +19,6 @@ class Machine(CoinExtractor, Tickets):
     def returnChange(self, change):
         '''algorithm for spending the change, returns string displayed on message box after transaction'''
         changeList = []
-        print(self._actuallyInMachine)
         for i in [float(c) for c in sorted(self._actuallyInMachine, reverse=True) if c <= float(change)]:
             changeList.append(Decimal(str(i)))
             change -= Decimal(str(i))
