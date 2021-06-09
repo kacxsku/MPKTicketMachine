@@ -67,6 +67,7 @@ class Machine(CoinExtractor, Tickets):
 
     def setRecenlty(self):
         self._recently_added_coins = []
+        self._actuallyInMachine = []
 
     def clearList(self):
         '''helper for tests'''
