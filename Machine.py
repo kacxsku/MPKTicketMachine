@@ -44,9 +44,9 @@ class Machine(CoinExtractor, Tickets):
         try:
             int(spinboxValue)
         except ValueError:
-            raise NotIntValueError()
+            raise NotIntValueError("Liczba pieniędzy musi być całkowita")
         if int(spinboxValue) <= 0:
-            raise NegativeNumberValueError()
+            raise NegativeNumberValueError("Liczba pieniędzy musi być dodatnia")
 
     def setTotalCost(self, value):
         '''set total cost of tickets'''
