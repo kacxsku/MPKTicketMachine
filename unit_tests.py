@@ -32,7 +32,7 @@ class MyTestCase(unittest.TestCase):
         '''gdy wrzucona jest nie wyliczona kwota i automat nie ma jak wydac reszty
          to powinien zwrocic komunikat o bledzie i zwrocic wrzucone monety'''
         machine = Machine()
-        machine.setRecenlty()
+        machine.clearList()
         machine.calculateAllChosenTicketsPrice("20 min ulgowy", '1')
         machine.addMoneyToMachine('1')
         Decimal(machine.substraction('1'))
@@ -44,7 +44,7 @@ class MyTestCase(unittest.TestCase):
     def test_adding(self):
         '''sprawdzenie dodawania 100 monet o wartosci 0.01'''
         machine = Machine()
-        machine.setRecenlty()
+        machine.clearList()
         for _ in range(0, 100):
             machine.addMoneyToMachine('0.01')
         self.assertEqual(1, machine.getAcctuallyInMachineSum())
