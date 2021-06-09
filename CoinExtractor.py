@@ -1,16 +1,17 @@
 from decimal import Decimal
 from Tickets import *
 
+
 class CoinExtractor(Tickets):
     """class for moneys operation"""
 
     #All available moneys
     _moneys = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0]
 
-
     def __init__(self):
         super().__init__()
         self._total_cost = Decimal('0')
+
     def calculateAllChosenTicketsPrice(self, choosen, value):
         '''calculate choosen ticket price'''
         self._total_cost += Decimal(str(Tickets.ticket[str(choosen)]*int(value)))

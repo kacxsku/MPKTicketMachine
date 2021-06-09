@@ -1,5 +1,4 @@
 import unittest
-
 from CoinExtractor import CoinExtractor
 from Machine import Machine
 from exceptions import *

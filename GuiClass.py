@@ -149,8 +149,6 @@ class Page2(tk.Frame):
             for _ in range(int(spinboxValue)):
                 self.machine.addMoneyToMachine(button_money)
 
-
-
     def calculateMoney(self, i, money, top):
         '''calculate moneys to pay, and printing propert messagebox'''
         moneysToPay = Decimal(money*int(self.coinsAmount_spinbox.get()))
@@ -158,7 +156,7 @@ class Page2(tk.Frame):
         change_info = self.machine.returnChange(-subtractedMoneys)
         self.showProperMsBox(change_info, top, i)
 
-    def showProperMsBox(self,change_info, top, i):
+    def showProperMsBox(self, change_info, top, i):
         '''show proper message box on value'''
         if subtractedMoneys == 0:
             self.correctChangeMessageBox(change_info, top)
@@ -175,8 +173,9 @@ class Page2(tk.Frame):
             self.quit()
 
     def correctChangeMessageBox(self, info, top):
-        '''showing change message box'''
+        '''showing message box with change info'''
         if messagebox.showinfo("showinfo", info) == "ok":
+            #closing Toplevel
             top.destroy()
             top.update()
             self.machine.setTotalCost(0)

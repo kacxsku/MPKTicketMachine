@@ -3,7 +3,7 @@ from Tickets import *
 from decimal import *
 from exceptions import *
 
-getcontext().prec = 3
+getcontext().prec = 3  #setting precision to 2 numbers after the comma
 
 
 class Machine(CoinExtractor, Tickets):
