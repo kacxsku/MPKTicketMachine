@@ -20,8 +20,9 @@ class Machine(CoinExtractor, Tickets):
         '''algorithm for spending the change, returns string displayed on message box after transaction'''
         changeList = []
         for i in [float(c) for c in sorted(self._actuallyInMachine, reverse=True) if c <= float(change)]:
-            changeList.append(Decimal(str(i)))
-            change -= Decimal(str(i))
+            if i <= change:
+                changeList.append(Decimal(str(i)))
+                change -= Decimal(str(i))
             if change == 0:
                 self._actuallyInMachine = [Decimal(str(k)) for k in self._actuallyInMachine if k not in changeList]
                 return "Twoja reszta :\n" + str(", ".join([str(float(i)) for i in changeList]))
